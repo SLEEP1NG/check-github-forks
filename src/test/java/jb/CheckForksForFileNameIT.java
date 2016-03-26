@@ -26,7 +26,19 @@ public class CheckForksForFileNameIT {
 	private void assertFork(String actualFork) {
 		assertThat("starts with generic api for repo", actualFork, startsWith("https://api.github.com/repos"));
 		assertThat("ends with api for repo name", actualFork, endsWith("/jforumCsrf"));
-
 	}
 
+	@Test
+	public void fileInFork() {
+		String fork = target.getForks("boyarsky", "jforumCsrf").get(0);
+		boolean actual = target.isFileInMasterOfFork(fork, "Owasp.CsrfGuard.js");
+		assertTrue("file found in fork", actual);
+	}
+
+	@Test
+	public void fileNotInFork() {
+		String fork = target.getForks("boyarsky", "jforumCsrf").get(0);
+		boolean actual = target.isFileInMasterOfFork(fork, "MadeUpFile");
+		assertFalse("file not found in fork", actual);
+	}
 }

@@ -1,6 +1,5 @@
 package jb;
 
-import java.io.*;
 import java.util.*;
 
 import org.springframework.web.client.*;
@@ -17,6 +16,13 @@ public class CheckForksForFileName {
 		template = new RestTemplate();
 	}
 
+	/**
+	 * Get all forks of the requested repository
+	 * 
+	 * @param userName
+	 * @param repoName
+	 * @return
+	 */
 	public List<String> getForks(String userName, String repoName) {
 		String url = "https://api.github.com/repos/" + userName + "/" + repoName + "/forks";
 
@@ -25,12 +31,31 @@ public class CheckForksForFileName {
 		JsonParser parser = new JsonParser();
 		JsonArray root = (JsonArray) parser.parse(jsonString);
 		root.forEach(this::addUrlForFork);
-		
+
 		return forks;
 	}
-	
+
 	private void addUrlForFork(JsonElement jsonElement) {
 		JsonObject jsonObject = (JsonObject) jsonElement;
 		forks.add(jsonObject.get("url").getAsString());
+	}
+
+	/**
+	 * Check whether the given file name is in the master of that fork
+	 * 
+	 * @param fork
+	 * @param string
+	 * @return
+	 */
+	public boolean isFileInMasterOfFork(String fork, String fileName) {
+		String url = "https://github.com/ddverni/jforumCsrf/blob/master/" + fileName;
+
+		try {
+			template.getForObject(url, String.class);
+		} catch (HttpClientErrorException e) {
+			return false;
+		}
+
+		return true;
 	}
 }
