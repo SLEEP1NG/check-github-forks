@@ -10,7 +10,9 @@ import com.google.gson.*;
 /**
  * Before running, go to https://github.com/settings/tokens/new and generate a
  * personal access token. You don't need to check any boxes for special
- * permissions. Copy that token under the TODO a few lines down.
+ * permissions. This is so you can make 5000 requests per hour rather than 60.
+ * (Per https://developer.github.com/v3/#rate-limiting). Copy that token under
+ * the TODO a few lines down.
  * 
  * @author jeanne
  *
@@ -73,17 +75,11 @@ public class CheckForksForFileName {
 	 * 
 	 */
 	public boolean isFileInMasterOfFork(String fork) {
-		String url = fork + "/blob/master/" + fileName;
-		// use URL format rather than REST API URL format
-		url = convertToBrowserUrl(url);
+		String url = fork + "/contents";
 
-		try {
-			callRestApi(url);
-		} catch (HttpClientErrorException e) {
-			return false;
-		}
-
-		return true;
+		String json = callRestApi(url);
+		// normally better to parse JSON, but here just looking for a string
+		return json.contains(fileName);
 	}
 
 	private String convertToBrowserUrl(String url) {
@@ -106,6 +102,7 @@ public class CheckForksForFileName {
 
 	private void printRepositoriesWithMatchingFile() {
 		List<String> forks = getForks();
-		forks.stream().filter(this::isFileInMasterOfFork).map(this::convertToBrowserUrl).forEach(System.out::println);
+		forks.stream().filter(this::isFileInMasterOfFork).map(this::convertToBrowserUrl).sorted()
+				.forEach(System.out::println);
 	}
 }
