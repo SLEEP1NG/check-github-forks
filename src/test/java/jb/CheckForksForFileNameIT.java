@@ -1,12 +1,12 @@
 package jb;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.*;
 import java.util.*;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 public class CheckForksForFileNameIT {
 
@@ -14,14 +14,14 @@ public class CheckForksForFileNameIT {
 	private PrintStream originalSystemOut;
 	private ByteArrayOutputStream mockSystemOut;
 
-	@Before
+	@BeforeEach
 	public void redirectSystemOut() {
 		originalSystemOut = System.out;
 		mockSystemOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(mockSystemOut));
 	}
 
-	@After
+	@AfterEach
 	public void restoreSystemOut() {
 		System.setOut(originalSystemOut);
 	}
@@ -48,7 +48,7 @@ public class CheckForksForFileNameIT {
 		target = new CheckForksForFileName("boyarsky", "jforumCsrf", "Owasp.CsrfGuard.js");
 		String fork = target.getForks().get(0);
 		boolean actual = target.isFileInMasterOfFork(fork);
-		assertTrue("file found in fork", actual);
+		assertTrue(actual, "file found in fork");
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class CheckForksForFileNameIT {
 		target = new CheckForksForFileName("boyarsky", "jforumCsrf", "MadeUpFile");
 		String fork = target.getForks().get(0);
 		boolean actual = target.isFileInMasterOfFork(fork);
-		assertFalse("file not found in fork", actual);
+		assertFalse(actual, "file not found in fork");
 	}
 
 	// -------------------------------------------------------------------------------
